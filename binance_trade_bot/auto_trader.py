@@ -147,27 +147,6 @@ class AutoTrader:
             self.logger.info(f"Will be jumping from {coin} to {best_pair.to_coin_id}")
             self.transaction_through_bridge(best_pair)
 
-    def bridge_scout(self):
-        """
-        If we have any bridge coin leftover, buy a coin with it that we won't immediately trade out of
-        """
-        bridge_balance = self.manager.get_currency_balance(self.config.BRIDGE.symbol)
-
-        for coin in self.db.get_coins():
-            current_coin_price = self.manager.get_ticker_price(coin + self.config.BRIDGE)
-
-            if current_coin_price is None:
-                continue
-
-            ratio_dict = self._get_ratios(coin, current_coin_price)
-            if not any(v > 0 for v in ratio_dict.values()):
-                # There will only be one coin where all the ratios are negative. When we find it, buy it if we can
-                if bridge_balance > self.manager.get_min_notional(coin.symbol, self.config.BRIDGE.symbol):
-                    self.logger.info(f"Will be purchasing {coin} using bridge coin")
-                    self.manager.buy_alt(coin, self.config.BRIDGE)
-                    return coin
-        return None
-
     def update_values(self):
         """
         Log current value state of all altcoin balances against BTC and USDT in DB.
