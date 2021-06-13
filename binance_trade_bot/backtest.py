@@ -1,3 +1,4 @@
+from binance_trade_bot.auto_trader import AutoTrader
 from collections import defaultdict
 from datetime import datetime, timedelta
 from traceback import format_exc
@@ -11,7 +12,6 @@ from .config import Config
 from .database import Database
 from .logger import Logger
 from .models import Coin, Pair
-from .strategies import get_strategy
 
 cache = SqliteDict("data/backtest_cache.db")
 
@@ -172,11 +172,7 @@ def backtest(
         manager.buy_alt(starting_coin, config.BRIDGE)
     db.set_current_coin(starting_coin)
 
-    strategy = get_strategy(config.STRATEGY)
-    if strategy is None:
-        logger.error("Invalid strategy name")
-        return manager
-    trader = strategy(manager, db, logger, config)
+    trader = AutoTrader(manager, db, logger, config)
     trader.initialize()
 
     yield manager

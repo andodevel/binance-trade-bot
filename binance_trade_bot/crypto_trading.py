@@ -1,4 +1,5 @@
 #!python3
+from binance_trade_bot.auto_trader import AutoTrader
 import time
 
 from .binance_api_manager import BinanceAPIManager
@@ -6,7 +7,6 @@ from .config import Config
 from .database import Database
 from .logger import Logger
 from .scheduler import SafeScheduler
-from .strategies import get_strategy
 
 
 def main():
@@ -23,11 +23,7 @@ def main():
         logger.error("Couldn't access Binance API - API keys may be wrong or lack sufficient permissions")
         logger.error(e)
         return
-    strategy = get_strategy(config.STRATEGY)
-    if strategy is None:
-        logger.error("Invalid strategy name")
-        return
-    trader = strategy(manager, db, logger, config)
+    trader = AutoTrader(manager, db, logger, config)
     logger.info(f"Chosen strategy: {config.STRATEGY}")
 
     logger.info("Creating database schema if it doesn't already exist")
