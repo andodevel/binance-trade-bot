@@ -93,7 +93,11 @@ def trade_history():
 @app.route("/api/scouting_history")
 def scouting_history():
     _current_coin = db.get_current_coin()
-    coin = _current_coin.symbol if _current_coin is not None else None
+    if current_coin is None:
+        return None
+    
+    _coin = _current_coin.coin
+    coin = _coin.symbol if _coin is not None else None
     session: Session
     with db.db_session() as session:
         query = (
@@ -111,7 +115,11 @@ def scouting_history():
 
 @app.route("/api/current_coin")
 def current_coin():
-    coin = db.get_current_coin()
+    _current_coin = db.get_current_coin()
+    if _current_coin is None:
+        return None
+    
+    coin = _current_coin.coin
     return coin.info() if coin else None
 
 
@@ -129,9 +137,13 @@ def current_coin_history():
 
 @app.route("/api/coins")
 def coins():
+    _current_coin = db.get_current_coin()
+    if _current_coin is None:
+        return None
+
     session: Session
     with db.db_session() as session:
-        _current_coin = session.merge(db.get_current_coin())
+        _current_coin = session.merge(_current_coin.coin)
         _coins: List[Coin] = session.query(Coin).all()
         return jsonify([{**coin.info(), "is_current": coin == _current_coin} for coin in _coins])
 

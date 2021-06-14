@@ -105,15 +105,21 @@ class Database:
             session.add(cc)
             self.send_update(cc)
 
-    def get_current_coin(self) -> Optional[Coin]:
+    def set_current_coin_price(self, cc: CurrentCoin, price: float):
+        session: Session
+        with self.db_session() as session:
+            cc.price = price
+            cc = session.merge(cc)
+            self.send_update(cc)
+
+    def get_current_coin(self) -> Optional[CurrentCoin]:
         session: Session
         with self.db_session() as session:
             current_coin = session.query(CurrentCoin).order_by(CurrentCoin.datetime.desc()).first()
             if current_coin is None:
                 return None
-            coin = current_coin.coin
-            session.expunge(coin)
-            return coin
+            session.expunge_all()
+            return current_coin
 
     def get_pair(self, from_coin: Union[Coin, str], to_coin: Union[Coin, str]):
         from_coin = self.get_coin(from_coin)

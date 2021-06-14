@@ -21,6 +21,7 @@ class AutoTrader:
 
     def initialize(self):
         self.initialize_trade_thresholds()
+        self.initialize_current_coin()
 
     def transaction_through_bridge(self, pair: Pair):
         """
@@ -117,15 +118,20 @@ class AutoTrader:
             # if we don't have a configuration, we selected a coin at random... Buy it so we can start trading.
             if self.config.CURRENT_COIN_SYMBOL == "":
                 current_coin = self.db.get_current_coin()
-                self.logger.info(f"Purchasing {current_coin} to begin trading")
-                self.manager.buy_alt(current_coin, self.config.BRIDGE)
+                self.logger.info(f"Purchasing {current_coin.coin} to begin trading")
+                self.manager.buy_alt(current_coin.coin, self.config.BRIDGE)
                 self.logger.info("Ready to start trading")
+        
+        # Update the current coin price.
+        current_coin = self.db.get_current_coin()
+        current_price = self.manager.get_ticker_price(current_coin.coin + self.config.BRIDGE)
+        self.db.set_current_coin_price(current_coin, current_price)
 
     def scout(self):
         """
         Scout for potential jumps from the current coin to another coin
         """
-        current_coin = self.db.get_current_coin()
+        current_coin = self.db.get_current_coin().coin
         # Display on the console, the current coin+Bridge, so users can see *some* activity and not think the bot has
         # stopped. Not logging though to reduce log size.
         print(
