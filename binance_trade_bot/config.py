@@ -18,7 +18,6 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
             "scout_sleep_time": "5",
             "hourToKeepScoutHistory": "1",
             "tld": "com",
-            "strategy": "default",
             "sell_timeout": "0",
             "buy_timeout": "0",
         }
@@ -65,8 +64,6 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self.SUPPORTED_COIN_LIST = supported_coin_list
 
         self.CURRENT_COIN_SYMBOL = os.environ.get("CURRENT_COIN_SYMBOL") or config.get(USER_CFG_SECTION, "current_coin")
-
-        self.STRATEGY = os.environ.get("STRATEGY") or config.get(USER_CFG_SECTION, "strategy")
 
         self.SELL_TIMEOUT = os.environ.get("SELL_TIMEOUT") or config.get(USER_CFG_SECTION, "sell_timeout")
         self.BUY_TIMEOUT = os.environ.get("BUY_TIMEOUT") or config.get(USER_CFG_SECTION, "buy_timeout")

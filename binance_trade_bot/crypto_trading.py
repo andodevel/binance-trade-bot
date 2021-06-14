@@ -23,15 +23,12 @@ def main():
         logger.error("Couldn't access Binance API - API keys may be wrong or lack sufficient permissions")
         logger.error(e)
         return
-    trader = AutoTrader(manager, db, logger, config)
-    logger.info(f"Chosen strategy: {config.STRATEGY}")
-
+    
     logger.info("Creating database schema if it doesn't already exist")
     db.create_database()
-
     db.set_coins(config.SUPPORTED_COIN_LIST)
-    db.migrate_old_state()
-
+    
+    trader = AutoTrader(manager, db, logger, config)
     trader.initialize()
 
     schedule = SafeScheduler(logger)

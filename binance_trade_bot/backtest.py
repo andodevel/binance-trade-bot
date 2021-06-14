@@ -165,12 +165,11 @@ def backtest(
     db = MockDatabase(logger, config)
     db.create_database()
     db.set_coins(config.SUPPORTED_COIN_LIST)
-    manager = MockBinanceManager(config, db, logger, start_date, start_balances)
 
+    manager = MockBinanceManager(config, db, logger, start_date, start_balances)
     starting_coin = db.get_coin(starting_coin or config.SUPPORTED_COIN_LIST[0])
     if manager.get_currency_balance(starting_coin.symbol) == 0:
         manager.buy_alt(starting_coin, config.BRIDGE)
-    db.set_current_coin(starting_coin)
 
     trader = AutoTrader(manager, db, logger, config)
     trader.initialize()
